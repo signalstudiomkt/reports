@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>시그널스튜디오 네이버 플레이스 주간 통계 리포트</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --color-bg: #ffffff;
+      --color-bg-secondary: #f5f5f3;
+      --color-bg-info: #e6f1fb;
+      --color-bg-success: #eaf3de;
+      --color-bg-warning: #faeeda;
+      --color-bg-danger: #fcebeb;
+      --color-text-primary: #1a1a18;
+      --color-text-secondary: #5f5e5a;
+      --color-border: rgba(0,0,0,0.12);
+      --color-border-secondary: rgba(0,0,0,0.22);
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-bg: #1c1c1a;
+        --color-bg-secondary: #262624;
+        --color-bg-info: #0c3050;
+        --color-bg-success: #1a3008;
+        --color-bg-warning: #3a2600;
+        --color-bg-danger: #3a1010;
+        --color-text-primary: #ebebea;
+        --color-text-secondary: #9a9892;
+        --color-border: rgba(255,255,255,0.1);
+        --color-border-secondary: rgba(255,255,255,0.2);
+      }
+    }
+
+    body {
+      background: var(--color-bg);
+      color: var(--color-text-primary);
+      font-family: var(--font-sans);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page-wrap {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    /* ── Header ── */
+    .report-header {
+      margin-bottom: 2rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 0.5px solid var(--color-border);
+    }
+    .report-header h1 {
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+      margin-bottom: 4px;
+    }
+    .report-header p {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+    }
+
+    /* ── Tabs ── */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .tab {
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      border: 0.5px solid var(--color-border-secondary);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      background: transparent;
+      color: var(--color-text-secondary);
+      font-family: var(--font-sans);
+      transition: background 0.12s, color 0.12s;
+    }
+    .tab:hover { background: var(--color-bg-secondary); }
+    .tab.active {
+      background: var(--color-bg-secondary);
+      color: var(--color-text-primary);
+      border-color: var(--color-border-secondary);
+    }
+
+    /* ── Panels ── */
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* ── Section ── */
+    .section { margin-bottom: 2rem; }
+    .section-title {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--color-text-secondary);
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+      padding-bottom: 6px;
+      border-bottom: 0.5px solid var(--color-border);
+    }
+
+    /* ── Metric Cards ── */
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px;
+      margin-bottom: 1.5rem;
+    }
+    .metric {
+      background: var(--color-bg-secondary);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+    }
+    .metric-label { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px; }
+    .metric-value { font-size: 21px; font-weight: 500; color: var(--color-text-primary); }
+    .metric-sub { font-size: 12px; color: var(--color-text-secondary); margin-top: 2px; }
+    .up { color: #1D9E75; }
+    .dn { color: #D85A30; }
+
+    /* ── Chart ── */
+    .chart-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 8px;
+      font-size: 12px;
+      color: var(--color-text-secondary);
+    }
+    .legend-dot {
+      width: 10px; height: 10px;
+      border-radius: 2px;
+      display: inline-block;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+    .chart-wrap {
+      position: relative;
+      width: 100%;
+    }
+
+    /* ── Insights ── */
+    .insight-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .insight-item {
+      padding: 10px 14px;
+      border-left: 3px solid;
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      font-size: 13px;
+      line-height: 1.65;
+    }
+    .insight-info    { background: var(--color-bg-info);    border-color: #378ADD; }
+    .insight-warn    { background: var(--color-bg-warning); border-color: #EF9F27; }
+    .insight-success { background: var(--color-bg-success); border-color: #639922; }
+    .insight-danger  { background: var(--color-bg-danger);  border-color: #E24B4A; }
+  </style>
+</head>
+<body>
+
+<div class="page-wrap">
+
+  <div class="report-header">
+    <h1>시그널스튜디오 &amp; 파티앳더시그널 — 네이버 플레이스 주간 통계 리포트</h1>
+    <p>2026년 1월~5월 | 네이버 플레이스 통계 기준 | 파티앳더시그널 별도 집계</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('ilsan')">시그널스튜디오 일산점</button>
+    <button class="tab" onclick="switchTab('gangseo')">시그널스튜디오 강서점</button>
+    <button class="tab" onclick="switchTab('party')">파티앳더시그널 일산점</button>
+  </div>
+
+  <!-- ══════════ 일산점 ══════════ -->
+  <div id="panel-ilsan" class="panel active">
+
+    <div class="section">
+      <div class="section-title">핵심 지표 요약 (2026년 1월~5월)</div>
+      <div class="metric-grid">
+        <div class="metric"><div class="metric-label">최고 주간 유입</div><div class="metric-value">1,552</div><div class="metric-sub">3/9~3/15</div></div>
+        <div class="metric"><div class="metric-label">최저 주간 유입 (4월~)</div><div class="metric-value">345</div><div class="metric-sub">5/18~5/24 <span class="dn">↓78%</span></div></div>
+        <div class="metric"><div class="metric-label">1~3월 주평균 유입</div><div class="metric-value">1,195</div><div class="metric-sub">13주 기준</div></div>
+        <div class="metric"><div class="metric-label">4~5월 주평균 유입</div><div class="metric-value">415</div><div class="metric-sub"><span class="dn">↓65% vs 1~3월</span></div></div>
+        <div class="metric"><div class="metric-label">스마트콜 최고</div><div class="metric-value">55건</div><div class="metric-sub">2/23~3/1</div></div>
+        <div class="metric"><div class="metric-label">예약전환율 (5월)</div><div class="metric-value">50%</div><div class="metric-sub"><span class="up">↑ 역대 최고</span></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">주간 플레이스 유입 추이</div>
+      <div class="chart-legend">
+        <span><span class="legend-dot" style="background:#3266ad"></span>플레이스 유입</span>
+        <span><span class="legend-dot" style="background:#1D9E75; border-bottom:2px dashed #1D9E75; background:transparent; border:1px dashed #1D9E75; width:18px; border-radius:0;"></span>스마트콜 (우축)</span>
+      </div>
+      <div class="chart-wrap" style="height:260px">
+        <canvas id="ilsan-inflow" role="img" aria-label="시그널스튜디오 일산점 주간 플레이스 유입 및 스마트콜 추이">유입은 3월 최고치 이후 4월부터 급감.</canvas>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">유입 경로 분석 (5월 평균)</div>
+      <div class="chart-wrap" style="height:220px">
+        <canvas id="ilsan-source" role="img" aria-label="시그널스튜디오 일산점 5월 유입 경로별 비중">5월 유입 상위 경로: 네이버지도, 네이버검색, 사이트검색광고, 플레이스광고, 지역소상공인.</canvas>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">주요 인사이트</div>
+      <ul class="insight-list">
+        <li class="insight-item insight-danger">📉 4월 첫 주(4/6~4/12) 플레이스 유입이 전주 대비 <strong>-68.2%</strong> 급락 (1,234 → 392). 이후 4~5월 전체가 300~500대에 머물러 1~3월 평균 대비 약 65% 하락. 광고 집행 조건 변화 또는 시즌 요인 점검 필요.</li>
+        <li class="insight-item insight-warn">🔍 3월까지 유입 1위였던 <strong>네이버검색</strong>이 4월부터 급감 (875 → 89~113). 대신 네이버지도 비중이 상대적으로 유지됨. 검색 노출 순위 하락 또는 키워드 경쟁 심화 가능성.</li>
+        <li class="insight-item insight-success">📞 5월 예약 전환율 <strong>50%</strong> 달성 — 유입 수는 줄었지만 전환 효율 역대 최고치. 인입 상담 품질이 높아진 것으로 해석 가능.</li>
+        <li class="insight-item insight-info">💬 톡톡 상담 전환율은 1월~5월 평균 약 12~13%대로 안정적. 5월 기준 상담 인입 31건, 예약 전환 13건(전환율 42%).</li>
+        <li class="insight-item insight-warn">📆 2월 4주차·3월 2주차 예약/주문 0건 — 스마트콜이 높았던 주에 예약이 없는 패턴. 문의와 예약 사이의 전환 장애 구간 점검 필요.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- ══════════ 강서점 ══════════ -->
+  <div id="panel-gangseo" class="panel">
+
+    <div class="section">
+      <div class="section-title">핵심 지표 요약 (2026년 1월~5월)</div>
+      <div class="metric-grid">
+        <div class="metric"><div class="metric-label">최고 주간 유입</div><div class="metric-value">1,721</div><div class="metric-sub">3/9~3/15</div></div>
+        <div class="metric"><div class="metric-label">최저 주간 유입 (4월~)</div><div class="metric-value">419</div><div class="metric-sub">5/25~5/31 <span class="dn">↓76%</span></div></div>
+        <div class="metric"><div class="metric-label">1~3월 주평균 유입</div><div class="metric-value">1,127</div><div class="metric-sub">13주 기준</div></div>
+        <div class="metric"><div class="metric-label">4~5월 주평균 유입</div><div class="metric-value">567</div><div class="metric-sub"><span class="dn">↓50% vs 1~3월</span></div></div>
+        <div class="metric"><div class="metric-label">스마트콜 최고</div><div class="metric-value">71건</div><div class="metric-sub">2/23~3/1</div></div>
+        <div class="metric"><div class="metric-label">누적 예약전환율</div><div class="metric-value">56.2%</div><div class="metric-sub"><span class="up">↑ 3개지점 최고</span></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">주간 플레이스 유입 추이</div>
+      <div class="chart-legend">
+        <span><span class="legend-dot" style="background:#533CB7"></span>플레이스 유입</span>
+        <span><span class="legend-dot" style="background:transparent; border:1px dashed #D85A30; border-radius:0; width:18px;"></span>스마트콜 (우축)</span>
+      </div>
+      <div class="chart-wrap" style="height:260px">
+        <canvas id="gangseo-inflow" role="img" aria-label="시그널스튜디오 강서점 주간 플레이스 유입 및 스마트콜 추이">강서점도 3월 최고치 이후 4월 급감.</canvas>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">유입 경로 분석 (5월 평균)</div>
+      <div class="chart-wrap" style="height:220px">
+        <canvas id="gangseo-source" role="img" aria-label="시그널스튜디오 강서점 5월 유입 경로별 비중">5월 강서점 유입 상위: 지역소상공인, 네이버지도, 네이버검색, 플레이스광고.</canvas>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">주요 인사이트</div>
+      <ul class="insight-list">
+        <li class="insight-item insight-danger">📉 4월 첫 주(4/6~4/12) 유입 -60.5% 급락 (1,415 → 559). 일산점과 동일한 시기에 전 매장 급락 — 플랫폼 정책 또는 광고 변경 등 외부 요인일 가능성 높음.</li>
+        <li class="insight-item insight-success">🏆 강서점 누적 예약 전환율 <strong>56.2%</strong>로 일산점(40.6%) 대비 약 16%p 높음. 전화문의 및 플레이스 예약 전환율 모두 우수.</li>
+        <li class="insight-item insight-info">🗺️ 강서점은 <strong>지역소상공인</strong> 채널과 <strong>네이버지도</strong> 비중이 일산점보다 상대적으로 높음. 지역 밀착 마케팅의 효과로 해석 가능.</li>
+        <li class="insight-item insight-warn">📉 5월 4주차 유입 419건으로 5월 최저치. 스마트콜도 27건으로 감소세. 5월 예약 전환율(41.7%)도 전월(63.3%) 대비 급락 — 집중 관리 필요.</li>
+        <li class="insight-item insight-info">💬 톡톡 월간 상담수는 3월 48건 피크 이후 4월 36건, 5월 35건으로 안정화. 6월 현재 27건으로 하락 추세 모니터링 필요.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- ══════════ 파티앳더시그널 ══════════ -->
+  <div id="panel-party" class="panel">
+
+    <div class="section">
+      <div class="section-title">핵심 지표 요약 (2026년 1월~5월)</div>
+      <div class="metric-grid">
+        <div class="metric"><div class="metric-label">최고 주간 유입</div><div class="metric-value">317</div><div class="metric-sub">2/23~3/1</div></div>
+        <div class="metric"><div class="metric-label">최저 주간 유입</div><div class="metric-value">145</div><div class="metric-sub">5/11~5/17 <span class="dn">↓54%</span></div></div>
+        <div class="metric"><div class="metric-label">1~3월 주평균 유입</div><div class="metric-value">259</div><div class="metric-sub">13주 기준</div></div>
+        <div class="metric"><div class="metric-label">4~5월 주평균 유입</div><div class="metric-value">245</div><div class="metric-sub"><span class="dn">↓5% (안정적)</span></div></div>
+        <div class="metric"><div class="metric-label">플레이스광고 비중</div><div class="metric-value">높음</div><div class="metric-sub">매주 top3 고정</div></div>
+        <div class="metric"><div class="metric-label">누적 예약전환율</div><div class="metric-value">29.6%</div><div class="metric-sub"><span class="dn">↓ 개선 필요</span></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">주간 플레이스 유입 추이</div>
+      <div class="chart-legend">
+        <span><span class="legend-dot" style="background:#BA7517"></span>플레이스 유입</span>
+        <span><span class="legend-dot" style="background:transparent; border:1px dashed #185FA5; border-radius:0; width:18px;"></span>스마트콜 (우축)</span>
+      </div>
+      <div class="chart-wrap" style="height:260px">
+        <canvas id="party-inflow" role="img" aria-label="파티앳더시그널 일산점 주간 플레이스 유입 및 스마트콜 추이">파티앳더시그널은 4월 이후 낙폭이 시그널스튜디오보다 작습니다.</canvas>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">유입 경로 분석 (2~4월 평균)</div>
+      <div class="chart-wrap" style="height:220px">
+        <canvas id="party-source" role="img" aria-label="파티앳더시그널 일산점 유입 경로별 비중">파티앳더시그널은 플레이스광고 비중이 시그널스튜디오 대비 높음.</canvas>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">주요 인사이트</div>
+      <ul class="insight-list">
+        <li class="insight-item insight-success">📊 4월 이후 유입 낙폭이 <strong>시그널스튜디오 대비 현저히 작음</strong> (-5%). 플레이스광고 의존도가 높아 알고리즘 영향을 덜 받은 것으로 추정.</li>
+        <li class="insight-item insight-danger">🎯 예약 전환율 누적 <strong>29.6%</strong>로 시그널스튜디오 대비 낮음. 특히 1월(17.8%), 2월(22.5%) 매우 낮은 수준. 문의-예약 전환 개선이 가장 시급한 과제.</li>
+        <li class="insight-item insight-warn">📉 5월 총문의 16건, 예약 5건으로 최근 수요 감소세. 톡톡 상담도 17건이나 플레이스 예약으로 이어지는 비율이 낮음.</li>
+        <li class="insight-item insight-info">🗓️ 6월 현재(6/1~) 총문의 7건, 예약 2건. 시즌 비수기 또는 인지도 확장 캠페인 필요 시점.</li>
+        <li class="insight-item insight-warn">📱 SNS 채널 문의가 월 1건 수준으로 미미. 파티 서비스 특성상 SNS 콘텐츠 마케팅 강화로 전환 가능성 있음.</li>
+      </ul>
+    </div>
+
+  </div>
+
+</div><!-- /.page-wrap -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const isDark = matchMedia('(prefers-color-scheme: dark)').matches;
+const gridC  = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)';
+const textC  = isDark ? 'rgba(255,255,255,0.5)'  : 'rgba(0,0,0,0.42)';
+
+const weeks = ['1/1주','1/2주','1/3주','1/4주','2/1주','2/2주','2/3주','2/4주',
+               '3/1주','3/2주','3/3주','3/4주','3/5주',
+               '4/1주','4/2주','4/3주','4/4주',
+               '5/1주','5/2주','5/3주','5/4주'];
+
+const data = {
+  ilsan: {
+    inflow: [917,1040,1065,1084,1314,1259,1321,1189,1205,1552,1169,1143,1234,392,392,432,413,511,380,345,349],
+    call:   [39,33,35,39,26,43,41,55,42,33,27,37,39,32,43,46,29,36,28,48,42]
+  },
+  gangseo: {
+    inflow: [793,678,597,604,993,1281,1496,1385,1407,1721,1543,1395,1415,559,543,670,604,732,500,505,419],
+    call:   [42,43,42,27,40,29,46,71,55,50,49,51,32,46,53,64,44,42,41,34,27]
+  },
+  party: {
+    inflow: [225,294,187,218,274,170,309,317,242,285,247,265,243,263,211,247,288,229,145,196,259],
+    call:   [14,14,15,8,16,11,17,17,12,11,16,11,15,12,12,11,13,11,9,17,14]
+  }
+};
+
+const colors = {
+  ilsan:   { line: '#3266ad', call: '#1D9E75' },
+  gangseo: { line: '#533CB7', call: '#D85A30' },
+  party:   { line: '#BA7517', call: '#185FA5' }
+};
+
+function makeLine(id, key) {
+  const c = colors[key];
+  new Chart(document.getElementById(id), {
+    type: 'line',
+    data: {
+      labels: weeks,
+      datasets: [
+        {
+          label: '유입', data: data[key].inflow,
+          borderColor: c.line, backgroundColor: c.line + '18',
+          borderWidth: 2, pointRadius: 2, pointHoverRadius: 4,
+          fill: true, tension: 0.3, yAxisID: 'y'
+        },
+        {
+          label: '스마트콜', data: data[key].call,
+          borderColor: c.call, backgroundColor: 'transparent',
+          borderWidth: 1.5, pointRadius: 2, borderDash: [5,3],
+          tension: 0.3, yAxisID: 'y1'
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { title: t => t[0].label + '차' } }
+      },
+      scales: {
+        x: { ticks: { font:{size:10}, color:textC, maxRotation:45, autoSkip:false }, grid:{ color:gridC } },
+        y: { ticks:{ font:{size:10}, color:textC }, grid:{ color:gridC },
+             title:{ display:true, text:'유입수', font:{size:10}, color:textC } },
+        y1: { position:'right', ticks:{ font:{size:10}, color:textC },
+              grid:{ drawOnChartArea:false },
+              title:{ display:true, text:'스마트콜', font:{size:10}, color:textC } }
+      }
+    }
+  });
+}
+
+function makeBar(id, labels, vals, palette) {
+  new Chart(document.getElementById(id), {
+    type: 'bar',
+    data: { labels, datasets:[{ label:'평균 유입', data:vals, backgroundColor:palette, borderRadius:4 }] },
+    options: {
+      responsive:true, maintainAspectRatio:false, indexAxis:'y',
+      plugins:{ legend:{ display:false } },
+      scales:{
+        x:{ ticks:{ font:{size:11}, color:textC }, grid:{ color:gridC } },
+        y:{ ticks:{ font:{size:11}, color:textC }, grid:{ color:'transparent' } }
+      }
+    }
+  });
+}
+
+const pal5 = ['#3266ad','#1D9E75','#D85A30','#BA7517','#9E3A9E'];
+
+makeLine('ilsan-inflow',   'ilsan');
+makeLine('gangseo-inflow', 'gangseo');
+makeLine('party-inflow',   'party');
+
+makeBar('ilsan-source',
+  ['네이버지도','네이버검색','사이트검색광고','플레이스광고','지역소상공인'],
+  [157,97,44,28,24], pal5);
+
+makeBar('gangseo-source',
+  ['네이버지도','지역소상공인','네이버검색','플레이스광고','기타'],
+  [228,110,101,35,18], pal5);
+
+makeBar('party-source',
+  ['네이버검색','네이버지도','플레이스광고','블로그','기타'],
+  [90,76,68,9,6], pal5);
+
+function switchTab(id) {
+  const ids = ['ilsan','gangseo','party'];
+  document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', ids[i] === id));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+}
+</script>
+
+</body>
+</html>

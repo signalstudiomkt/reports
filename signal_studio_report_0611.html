@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>시그널스튜디오 주간 현황 리포트 — 2026.06.11</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #F5F4F0;
+    font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+    color: #1A1916;
+    min-height: 100vh;
+    padding: 2rem 1rem;
+  }
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    background: #FDFCF8;
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    box-shadow: 0 2px 24px rgba(0,0,0,0.07);
+  }
+  .report-date { font-size: 12px; color: #888780; margin-bottom: 4px; letter-spacing: 0.02em; }
+  .report-title { font-size: 22px; font-weight: 600; color: #1A1916; margin-bottom: 4px; }
+  .report-sub { font-size: 13px; color: #888780; }
+  .divider { border: none; border-top: 1px solid #E8E6E0; margin: 1.25rem 0; }
+  .sl { font-size: 11px; font-weight: 600; color: #888780; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.75rem; }
+  .alert { background: #FFF8EC; border: 1px solid #F0D080; border-radius: 8px; padding: 0.75rem 1rem; font-size: 13px; color: #9A6800; margin-bottom: 1rem; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1.25rem; }
+  @media (max-width: 520px) { .grid2 { grid-template-columns: 1fr; } }
+  .card { background: #FDFCF8; border: 1px solid #E8E6E0; border-radius: 12px; padding: 1rem 1.25rem; }
+  .card-title { font-size: 13px; font-weight: 600; color: #1A1916; margin-bottom: 0.75rem; }
+  .card-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid #F0EDE6; font-size: 13px; }
+  .card-row:last-child { border-bottom: none; }
+  .card-key { color: #888780; }
+  .card-val { font-weight: 500; color: #1A1916; }
+  .pr { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; }
+  .pr:last-child { margin-bottom: 0; }
+  .pr-label { font-size: 13px; color: #1A1916; min-width: 148px; }
+  .pr-bar-wrap { flex: 1; height: 8px; background: #EEECE6; border-radius: 99px; overflow: hidden; }
+  .pr-bar { height: 100%; border-radius: 99px; }
+  .pr-pct { font-size: 13px; font-weight: 500; min-width: 58px; text-align: right; }
+  .tbl-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  thead th { font-size: 11px; font-weight: 600; color: #888780; text-align: center; padding: 6px 8px; border-bottom: 1px solid #E8E6E0; background: #F5F4F0; white-space: nowrap; }
+  thead th:first-child { text-align: left; }
+  tbody td { padding: 7px 8px; text-align: center; border-bottom: 1px solid #F0EDE6; color: #1A1916; }
+  tbody td:first-child { text-align: left; color: #888780; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr.prev td { background: #FAFAF8; color: #AAAAAA; }
+  tbody tr.prev td:first-child { color: #AAAAAA; }
+  tbody tr.hl td { background: #EEF4FF; font-weight: 600; }
+  .metric-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.25rem; }
+  @media (max-width: 480px) { .metric-grid { grid-template-columns: 1fr 1fr; } }
+  .metric-card { background: #F5F4F0; border-radius: 10px; padding: 0.875rem 1rem; }
+  .metric-label { font-size: 11px; color: #888780; margin-bottom: 4px; }
+  .metric-val { font-size: 22px; font-weight: 600; color: #1A1916; line-height: 1.2; }
+  .metric-sub { font-size: 11px; color: #888780; margin-top: 2px; }
+  .badge { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 99px; }
+  .badge-success { background: #D6F5E8; color: #1D6B4E; }
+  .badge-warning { background: #FFF0CC; color: #9A6800; }
+  .badge-danger  { background: #FFE5E4; color: #C0322F; }
+  .badge-info    { background: #E0EDFF; color: #1A52A3; }
+  .action-list { list-style: none; }
+  .action-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid #F0EDE6; }
+  .action-item:last-child { border-bottom: none; }
+  .action-num { font-size: 11px; font-weight: 600; color: #C8C5BC; min-width: 20px; padding-top: 2px; }
+  .action-body { flex: 1; }
+  .action-title { font-size: 13px; font-weight: 600; color: #1A1916; margin-bottom: 3px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .action-desc { font-size: 13px; color: #6A6861; line-height: 1.6; }
+  .chart-wrap { position: relative; width: 100%; height: 200px; margin-bottom: 0.5rem; }
+  .chart-legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 1.5rem; font-size: 12px; color: #888780; align-items: center; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+  .footer { font-size: 11px; color: #B0ADA6; line-height: 1.6; }
+  .c-purple { color: #534AB7; }
+  .c-green  { color: #1D9E75; }
+  .c-orange { color: #BA7517; }
+  .c-red    { color: #C0322F; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <p class="report-date">2026년 6월 11일 (목) · 주간 팀 보고</p>
+  <h1 class="report-title">시그널스튜디오 주간 현황 리포트</h1>
+  <p class="report-sub">일산점 · 강서점 통합 | 시그널스튜디오 + 파티앳더시그널 일산점</p>
+
+  <hr class="divider">
+
+  <!-- 6월 목표 달성 현황 -->
+  <p class="sl">6월 목표 달성률 (1주차 완료 · 6/1~6/7 기준)</p>
+  <div class="alert">6월 1주차(6/1~6/7) 완료 기준 — 잔여 3주간 집중 필요. 파티앳더시그널 6월 예약 0건으로 즉각 대응 필요.</div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-title">일산점 — 시그널스튜디오</div>
+      <div class="card-row"><span class="card-key">6월 목표</span><span class="card-val">50건</span></div>
+      <div class="card-row"><span class="card-key">현재 예약 (1주차)</span><span class="card-val">2건</span></div>
+      <div class="card-row"><span class="card-key">잔여 목표</span><span class="card-val">48건</span></div>
+      <div class="card-row"><span class="card-key">5월 최종 실적</span><span class="card-val">38건 (76%)</span></div>
+      <div class="card-row"><span class="card-key">6월 전환율</span><span class="card-val c-red">20.0%</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title">강서점 — 시그널스튜디오</div>
+      <div class="card-row"><span class="card-key">6월 목표</span><span class="card-val">50건</span></div>
+      <div class="card-row"><span class="card-key">현재 예약 (1주차)</span><span class="card-val">7건</span></div>
+      <div class="card-row"><span class="card-key">잔여 목표</span><span class="card-val">43건</span></div>
+      <div class="card-row"><span class="card-key">5월 최종 실적</span><span class="card-val">30건 (60%)</span></div>
+      <div class="card-row"><span class="card-key">6월 전환율</span><span class="card-val c-orange">38.9%</span></div>
+    </div>
+  </div>
+
+  <!-- 달성률 바 -->
+  <p class="sl">월간 예약 목표 달성률 추이 — 시그널스튜디오 (목표 50건)</p>
+
+  <div style="margin-bottom:.75rem;">
+    <div class="pr"><span class="pr-label">일산 3월</span><div class="pr-bar-wrap"><div class="pr-bar" style="width:62%;background:#BA7517;"></div></div><span class="pr-pct c-orange">31건 62%</span></div>
+    <div class="pr"><span class="pr-label">일산 4월</span><div class="pr-bar-wrap"><div class="pr-bar" style="width:62%;background:#BA7517;"></div></div><span class="pr-pct c-orange">31건 62%</span></div>
+    <div class="pr"><span class="pr-label">일산 5월 ✓</span><div class="pr-bar-wrap"><div class="pr-bar" style="width:76%;background:#534AB7;"></div></div><span class="pr-pct c-purple">38건 76%</span></div>
+    <div class="pr"><span class="pr-label">일산 6월 ▶(1주)</span><div class="pr-bar-wrap"><div class="pr-bar" style="width:4%;background:#C0322F;"></div></div><span class="pr-pct c-red">2건 4%</span></div>
+  </div>
+
+  <!-- 일산 인바운드 테이블 -->
+  <div class="card" style="margin-bottom:1rem;">
+    <div class="card-title" style="margin-bottom:.75rem;">일산점 — 월별 총문의 현황 및 예약 전환율</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>월</th><th>총문의</th><th>예약완료</th><th>전환율</th><th>전화</th><th>톡톡</th><th>플레이스</th><th>홈페이지</th></tr></thead>
+        <tbody>
+          <tr class="prev"><td>3월</td><td>80건</td><td>31건</td><td style="font-weight:600;">38.8%</td><td>39</td><td>20</td><td>8</td><td>9</td></tr>
+          <tr class="prev"><td>4월</td><td>73건</td><td>31건</td><td style="font-weight:600;">42.5%</td><td>45</td><td>11</td><td>4</td><td>12</td></tr>
+          <tr><td>5월 ✓</td><td>76건</td><td>38건</td><td class="c-green" style="font-weight:600;">50.0%</td><td>29</td><td>17</td><td>9</td><td>14</td></tr>
+          <tr class="hl"><td>6월 ▶</td><td>10건</td><td>2건</td><td class="c-red" style="font-weight:600;">20.0%</td><td>1</td><td>4</td><td>1</td><td>3</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div style="margin-bottom:.75rem;">
+    <div class="pr"><span class="pr-label">강서 3월</span><div class="pr-bar-wrap"><div class="pr-bar" style="width:94%;background:#1D9E75;"></div></div><span class="pr-pct c-green">47건 94%</span></div>
+    <div class="pr"><span class="pr-label">강서 4월</span><div class="pr-bar-wrap"><div class="pr-bar" style="width:94%;background:#1D9E75;"></div></div><span class="pr-pct c-green">47건 94%</span></div>
+    <div class="pr"><span class="pr-label">강서 5월 ✓</span><div class="pr-bar-wrap"><div class="pr-bar" style="width:60%;background:#BA7517;"></div></div><span class="pr-pct c-orange">30건 60%</span></div>
+    <div class="pr"><span class="pr-label">강서 6월 ▶(1주)</span><div class="pr-bar-wrap"><div class="pr-bar" style="width:14%;background:#BA7517;"></div></div><span class="pr-pct c-orange">7건 14%</span></div>
+  </div>
+
+  <!-- 강서 인바운드 테이블 -->
+  <div class="card" style="margin-bottom:1.25rem;">
+    <div class="card-title" style="margin-bottom:.75rem;">강서점 — 월별 총문의 현황 및 예약 전환율</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>월</th><th>총문의</th><th>예약완료</th><th>전환율</th><th>전화</th><th>톡톡</th><th>플레이스</th><th>홈페이지</th></tr></thead>
+        <tbody>
+          <tr class="prev"><td>3월</td><td>76건</td><td>47건</td><td style="font-weight:600;">61.8%</td><td>43</td><td>17</td><td>6</td><td>7</td></tr>
+          <tr class="prev"><td>4월</td><td>75건</td><td>47건</td><td style="font-weight:600;">62.7%</td><td>41</td><td>12</td><td>12</td><td>5</td></tr>
+          <tr><td>5월 ✓</td><td>72건</td><td>30건</td><td class="c-orange" style="font-weight:600;">41.7%</td><td>28</td><td>11</td><td>15</td><td>11</td></tr>
+          <tr class="hl"><td>6월 ▶</td><td>18건</td><td>7건</td><td class="c-orange" style="font-weight:600;">38.9%</td><td>11</td><td>5</td><td>2</td><td>0</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- 파티앳더시그널 -->
+  <p class="sl">파티앳더시그널 일산점 — 인바운드 월별 문의 통계 (목표 10건 예약완료)</p>
+
+  <div class="card" style="margin-bottom:1.25rem;">
+    <div class="card-title" style="margin-bottom:.75rem;">
+      일산점 — 파티앳더시그널
+      <span style="font-size:11px;color:#888780;font-weight:400;margin-left:4px;">📊 파티_일산점_주간통합대시보드 기준</span>
+    </div>
+    <div class="pr"><span class="pr-label">3월 예약완료 15건</span><div class="pr-bar-wrap"><div class="pr-bar" style="width:100%;background:#1D9E75;"></div></div><span class="pr-pct c-green">150%</span></div>
+    <div class="pr"><span class="pr-label">4월 예약완료 6건</span><div class="pr-bar-wrap"><div class="pr-bar" style="width:60%;background:#BA7517;"></div></div><span class="pr-pct c-orange">60%</span></div>
+    <div class="pr"><span class="pr-label">5월 예약완료 5건 ✓</span><div class="pr-bar-wrap"><div class="pr-bar" style="width:50%;background:#BA7517;"></div></div><span class="pr-pct c-orange">50%</span></div>
+    <div class="pr"><span class="pr-label">6월 예약완료 0건 ▶</span><div class="pr-bar-wrap"><div class="pr-bar" style="width:0%;background:#C0322F;"></div></div><span class="pr-pct c-red">0% ⚠</span></div>
+  </div>
+
+  <div class="grid2" style="margin-bottom:1.25rem;">
+    <div class="card">
+      <div class="card-title" style="margin-bottom:.5rem;">월별 총문의 현황</div>
+      <div class="card-row"><span class="card-key">3월</span><span class="card-val">33건 → 예약 15건</span></div>
+      <div class="card-row"><span class="card-key">4월</span><span class="card-val">20건 → 예약 6건</span></div>
+      <div class="card-row"><span class="card-key">5월 ✓</span><span class="card-val">16건 → 예약 5건</span></div>
+      <div class="card-row"><span class="card-key">6월 ▶</span><span class="card-val">14건 → 예약 0건</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="margin-bottom:.5rem;">월별 예약 전환율</div>
+      <div class="card-row"><span class="card-key">3월</span><span class="card-val">45.5% <span class="badge badge-success">역대최고</span></span></div>
+      <div class="card-row"><span class="card-key">4월</span><span class="card-val">30.0%</span></div>
+      <div class="card-row"><span class="card-key">5월 ✓</span><span class="card-val">31.3%</span></div>
+      <div class="card-row"><span class="card-key">6월 ▶</span><span class="card-val">0.0% <span class="badge badge-danger">즉각 대응</span></span></div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- 차트 -->
+  <p class="sl">시그널스튜디오 월별 예약 실적 추이</p>
+  <div class="chart-wrap">
+    <canvas id="bookingChart"></canvas>
+  </div>
+  <div class="chart-legend">
+    <span style="display:flex;align-items:center;gap:5px;"><span class="legend-dot" style="background:#534AB7;"></span>일산점</span>
+    <span style="display:flex;align-items:center;gap:5px;"><span class="legend-dot" style="background:#1D9E75;"></span>강서점</span>
+    <span style="display:flex;align-items:center;gap:5px;"><span class="legend-dot" style="border:1.5px dashed #999;background:transparent;"></span>목표 (50건)</span>
+    <span style="display:flex;align-items:center;gap:5px;"><span class="legend-dot" style="background:rgba(83,74,183,0.4);"></span>6월 진행중</span>
+  </div>
+
+  <hr class="divider">
+
+  <!-- 주요 지표 -->
+  <p class="sl">6월 주요 지표 요약 (1주차 · 6/1~6/7)</p>
+  <div class="metric-grid">
+    <div class="metric-card">
+      <div class="metric-label">일산 총문의 (6월)</div>
+      <div class="metric-val">10건</div>
+      <div class="metric-sub">전환율 20.0% · 잔여 48건</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">강서 총문의 (6월)</div>
+      <div class="metric-val">18건</div>
+      <div class="metric-sub">전환율 38.9% · 잔여 43건</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">파티 일산 (6월)</div>
+      <div class="metric-val">14건</div>
+      <div class="metric-sub">예약 0건 (0.0%) ⚠</div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- 액션 플랜 -->
+  <p class="sl">6월 목표 달성을 위한 핵심 액션</p>
+  <ul class="action-list">
+    <li class="action-item">
+      <span class="action-num">01</span>
+      <div class="action-body">
+        <div class="action-title">파티앳더시그널 6월 예약 전환 즉각 대응 <span class="badge badge-danger">긴급</span></div>
+        <div class="action-desc">6월 총문의 14건(톡톡8건 포함)임에도 예약 0건 — 문의가 들어오고 있으나 전혀 전환이 되지 않는 상황. 톡톡 응대 속도·내용 즉시 점검 및 미응답 문의 팔로업 필요.</div>
+      </div>
+    </li>
+    <li class="action-item">
+      <span class="action-num">02</span>
+      <div class="action-body">
+        <div class="action-title">일산점 전환율 20% → 50%대 회복 <span class="badge badge-danger">긴급</span></div>
+        <div class="action-desc">6월 일산점 전환율 20.0%로 5월(50.0%) 대비 급락. 총문의 10건 중 8건이 미전환 — 5월에 효과적이었던 톡톡 응대 방식을 즉시 복원하고 미결 상담 재접촉 필요.</div>
+      </div>
+    </li>
+    <li class="action-item">
+      <span class="action-num">03</span>
+      <div class="action-body">
+        <div class="action-title">강서점 전화 문의 전환율 개선 <span class="badge badge-warning">우선</span></div>
+        <div class="action-desc">강서점 6월 전화 11건 중 예약 3건(27%) — 전화 전환율이 낮은 패턴이 5월부터 지속. 전화 응대 스크립트 및 재연락 프로세스 강화로 6월 목표 달성 속도 높여야 함.</div>
+      </div>
+    </li>
+    <li class="action-item">
+      <span class="action-num">04</span>
+      <div class="action-body">
+        <div class="action-title">강서점 플레이스 유입 반등 활용 <span class="badge badge-info">중기</span></div>
+        <div class="action-desc">강서점 6월 1주차 플레이스 유입 498건으로 5월 4주차(419건) 대비 +18.9% 반등 — 플레이스 문의 2건 모두 전환(100%) 유지 중. 리뷰 관리 및 사진 업데이트로 유입 확대 가능.</div>
+      </div>
+    </li>
+    <li class="action-item">
+      <span class="action-num">05</span>
+      <div class="action-body">
+        <div class="action-title">일산점 홈페이지 문의 전환율 강화</div>
+        <div class="action-desc">6월 홈페이지 문의 3건 중 전환 0건 — 5월엔 14건 중 3건(21%)이었으나 6월 전환 없음. 홈페이지 상담 인입 후 응대 속도 점검 필요.</div>
+      </div>
+    </li>
+  </ul>
+
+  <hr class="divider">
+  <p class="footer">데이터 출처: 📊 파티_일산점_주간통합대시보드 · 시그널스튜디오 일산/강서점 주간통합리포트<br>※ 6월 수치는 1주차(6/1~6/7) 기준 진행 중 데이터 | 5월은 최종 확정 데이터</p>
+
+</div>
+
+<script>
+new Chart(document.getElementById('bookingChart'), {
+  type: 'bar',
+  data: {
+    labels: ['1월', '2월', '3월', '4월', '5월 ✓', '6월 ▶'],
+    datasets: [
+      {
+        label: '일산점',
+        data: [40, 42, 31, 31, 38, 2],
+        backgroundColor: ['#534AB7','#534AB7','#534AB7','#534AB7','#534AB7','rgba(83,74,183,0.4)'],
+        borderRadius: 5
+      },
+      {
+        label: '강서점',
+        data: [30, 51, 47, 47, 30, 7],
+        backgroundColor: ['#1D9E75','#1D9E75','#1D9E75','#1D9E75','#1D9E75','rgba(29,158,117,0.4)'],
+        borderRadius: 5
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: {
+        beginAtZero: true, max: 60,
+        ticks: { color: '#888780', font: { size: 11 } },
+        grid: { color: 'rgba(0,0,0,0.06)' }
+      },
+      x: {
+        ticks: { color: '#888780', font: { size: 11 } },
+        grid: { display: false }
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>

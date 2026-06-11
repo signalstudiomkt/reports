@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>시그널스튜디오 주간 리포트 — 2026년 6월 1주차</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #ffffff; --bg2: #f5f5f3; --bg3: #efefed;
+      --bg-info: #e6f1fb; --bg-success: #eaf3de; --bg-warn: #faeeda; --bg-danger: #fcebeb;
+      --t1: #1a1a18; --t2: #5f5e5a; --t3: #9a9892;
+      --border: rgba(0,0,0,0.11); --border2: rgba(0,0,0,0.2);
+      --r: 8px; --rl: 12px;
+      --font: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg:#1c1c1a; --bg2:#262624; --bg3:#2e2e2c;
+        --bg-info:#0c3050; --bg-success:#1a3008; --bg-warn:#3a2600; --bg-danger:#3a1010;
+        --t1:#ebebea; --t2:#9a9892; --t3:#6a6a66;
+        --border:rgba(255,255,255,0.1); --border2:rgba(255,255,255,0.2);
+      }
+    }
+    body { background:var(--bg); color:var(--t1); font-family:var(--font); font-size:15px; line-height:1.6; -webkit-font-smoothing:antialiased; }
+    .wrap { max-width:760px; margin:0 auto; padding:2rem 1rem; }
+
+    /* header */
+    .rpt-head { margin-bottom:2rem; padding-bottom:1.25rem; border-bottom:0.5px solid var(--border); }
+    .rpt-head h1 { font-size:19px; font-weight:500; margin-bottom:4px; }
+    .rpt-head .meta { font-size:12px; color:var(--t2); display:flex; flex-wrap:wrap; gap:10px; }
+    .badge { display:inline-block; padding:2px 9px; border-radius:20px; font-size:11px; font-weight:500; }
+    .badge-week { background:var(--bg-info); color:#185FA5; }
+    .badge-warn { background:var(--bg-warn); color:#854F0B; }
+    .badge-ok   { background:var(--bg-success); color:#3B6D11; }
+
+    /* tabs */
+    .tabs { display:flex; gap:4px; margin-bottom:1.5rem; flex-wrap:wrap; }
+    .tab { padding:6px 14px; font-size:13px; font-weight:500; border:0.5px solid var(--border2); border-radius:var(--r); cursor:pointer; background:transparent; color:var(--t2); font-family:var(--font); transition:background .12s; }
+    .tab:hover { background:var(--bg2); }
+    .tab.active { background:var(--bg2); color:var(--t1); }
+    .panel { display:none; } .panel.active { display:block; }
+
+    /* section */
+    .sec { margin-bottom:2rem; }
+    .sec-title { font-size:10px; font-weight:500; color:var(--t2); letter-spacing:.08em; text-transform:uppercase; margin-bottom:.75rem; padding-bottom:6px; border-bottom:.5px solid var(--border); }
+
+    /* this-week hero */
+    .hero { background:var(--bg2); border-radius:var(--rl); padding:1.25rem 1.25rem 1rem; margin-bottom:1.25rem; }
+    .hero-top { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:1rem; }
+    .hero-title { font-size:13px; color:var(--t2); margin-bottom:2px; }
+    .hero-val { font-size:32px; font-weight:500; line-height:1.15; }
+    .hero-cmp { font-size:12px; color:var(--t2); margin-top:3px; }
+    .hero-divider { width:0.5px; background:var(--border); align-self:stretch; }
+    .hero-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:10px; padding-top:.75rem; border-top:.5px solid var(--border); }
+    .hero-cell { }
+    .hero-cell-label { font-size:11px; color:var(--t2); margin-bottom:2px; }
+    .hero-cell-val { font-size:18px; font-weight:500; }
+    .hero-cell-sub { font-size:11px; color:var(--t3); margin-top:1px; }
+    .up { color:#1D9E75; } .dn { color:#D85A30; } .neu { color:var(--t2); }
+
+    /* metric grid */
+    .mg { display:grid; grid-template-columns:repeat(auto-fit,minmax(125px,1fr)); gap:10px; margin-bottom:1.25rem; }
+    .mc { background:var(--bg2); border-radius:var(--r); padding:11px 13px; }
+    .mc-l { font-size:11px; color:var(--t2); margin-bottom:3px; }
+    .mc-v { font-size:20px; font-weight:500; }
+    .mc-s { font-size:11px; color:var(--t3); margin-top:2px; }
+
+    /* source table */
+    .src-table { width:100%; border-collapse:collapse; font-size:13px; }
+    .src-table th { font-size:10px; font-weight:500; color:var(--t2); text-align:left; padding:5px 8px; border-bottom:.5px solid var(--border); letter-spacing:.05em; }
+    .src-table td { padding:7px 8px; border-bottom:.5px solid var(--border); vertical-align:middle; }
+    .src-table tr:last-child td { border-bottom:none; }
+    .src-bar-wrap { background:var(--bg3); border-radius:3px; height:6px; width:100%; min-width:60px; }
+    .src-bar { height:6px; border-radius:3px; }
+    .rank-pill { display:inline-block; width:18px; height:18px; border-radius:50%; font-size:10px; font-weight:500; text-align:center; line-height:18px; background:var(--bg3); color:var(--t2); }
+
+    /* chart */
+    .clegend { display:flex; flex-wrap:wrap; gap:12px; margin-bottom:8px; font-size:12px; color:var(--t2); }
+    .cdot { width:10px; height:10px; border-radius:2px; display:inline-block; margin-right:4px; vertical-align:middle; }
+    .cwrap { position:relative; width:100%; }
+
+    /* insights */
+    .ins-list { list-style:none; display:flex; flex-direction:column; gap:7px; }
+    .ins { padding:10px 13px; border-left:3px solid; border-radius:0 var(--r) var(--r) 0; font-size:13px; line-height:1.65; }
+    .ins-info    { background:var(--bg-info);    border-color:#378ADD; }
+    .ins-warn    { background:var(--bg-warn);    border-color:#EF9F27; }
+    .ins-ok      { background:var(--bg-success); border-color:#639922; }
+    .ins-danger  { background:var(--bg-danger);  border-color:#E24B4A; }
+
+    /* trend arrow inline */
+    .arr { font-size:12px; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="rpt-head">
+    <h1>시그널스튜디오 &amp; 파티앳더시그널 — 주간 통합 리포트</h1>
+    <div class="meta">
+      <span class="badge badge-week">2026년 6월 1주차 &nbsp;|&nbsp; 6/1 – 6/7</span>
+      <span style="color:var(--t3)">네이버 플레이스 통계 기준 | 파티앳더시그널 별도 집계</span>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="sw('ilsan')">시그널스튜디오 일산점</button>
+    <button class="tab" onclick="sw('gangseo')">시그널스튜디오 강서점</button>
+    <button class="tab" onclick="sw('party')">파티앳더시그널 일산점</button>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       일산점
+  ═══════════════════════════════════════ -->
+  <div id="p-ilsan" class="panel active">
+
+    <div class="sec">
+      <div class="sec-title">이번 주 핵심 지표 — 6/1~6/7</div>
+      <div class="hero">
+        <div class="hero-top">
+          <div>
+            <div class="hero-title">플레이스 유입</div>
+            <div class="hero-val">297</div>
+            <div class="hero-cmp"><span class="dn arr">↓ -14.9%</span> &nbsp;전주(349) 대비</div>
+          </div>
+          <div class="hero-divider"></div>
+          <div>
+            <div class="hero-title">스마트콜</div>
+            <div class="hero-val">25건</div>
+            <div class="hero-cmp"><span class="dn arr">↓ -40.5%</span> &nbsp;전주(42) 대비</div>
+          </div>
+          <div class="hero-divider"></div>
+          <div>
+            <div class="hero-title">예약/주문</div>
+            <div class="hero-val">0건</div>
+            <div class="hero-cmp"><span class="dn arr">↓ -100%</span> &nbsp;전주(3) 대비</div>
+          </div>
+        </div>
+        <div class="hero-grid">
+          <div class="hero-cell"><div class="hero-cell-label">리뷰 수</div><div class="hero-cell-val">3건</div><div class="hero-cell-sub"><span class="dn">↓ -62.5%</span> 전주</div></div>
+          <div class="hero-cell"><div class="hero-cell-label">일평균 유입</div><div class="hero-cell-val">42</div><div class="hero-cell-sub">전주 50</div></div>
+          <div class="hero-cell"><div class="hero-cell-label">일평균 콜</div><div class="hero-cell-val">4건</div><div class="hero-cell-sub">전주 6건</div></div>
+          <div class="hero-cell"><div class="hero-cell-label">톡톡 상담</div><div class="hero-cell-val">4건</div><div class="hero-cell-sub"><span class="dn">↓ -55.6%</span> 전주</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-title">6월 누적 인바운드 (6/1~ 현재)</div>
+      <div class="mg">
+        <div class="mc"><div class="mc-l">총 문의</div><div class="mc-v">10건</div><div class="mc-s">5월 76건 → 급감</div></div>
+        <div class="mc"><div class="mc-l">예약 완료</div><div class="mc-v">2건</div><div class="mc-s"><span class="dn">전환율 20%</span></div></div>
+        <div class="mc"><div class="mc-l">전화 문의</div><div class="mc-v">1건</div><div class="mc-s">5월 29건 → 급감</div></div>
+        <div class="mc"><div class="mc-l">톡톡 문의</div><div class="mc-v">4건</div><div class="mc-s">주요 채널 유지</div></div>
+        <div class="mc"><div class="mc-l">홈페이지</div><div class="mc-v">3건</div><div class="mc-s">비중 확대</div></div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-title">유입 경로 분석 — 6/1~6/7</div>
+      <table class="src-table">
+        <thead><tr><th>#</th><th>채널</th><th>유입 수</th><th>비중</th><th></th></tr></thead>
+        <tbody>
+          <tr><td><span class="rank-pill">1</span></td><td>네이버지도</td><td>141</td><td>47.5%</td><td><div class="src-bar-wrap"><div class="src-bar" style="width:100%;background:#3266ad"></div></div></td></tr>
+          <tr><td><span class="rank-pill">2</span></td><td>네이버검색</td><td>71</td><td>23.9%</td><td><div class="src-bar-wrap"><div class="src-bar" style="width:50%;background:#1D9E75"></div></div></td></tr>
+          <tr><td><span class="rank-pill">3</span></td><td>플레이스광고</td><td>22</td><td>7.4%</td><td><div class="src-bar-wrap"><div class="src-bar" style="width:16%;background:#D85A30"></div></div></td></tr>
+          <tr><td><span class="rank-pill">4</span></td><td>지역소상공인</td><td>29</td><td>9.8%</td><td><div class="src-bar-wrap"><div class="src-bar" style="width:21%;background:#BA7517"></div></div></td></tr>
+          <tr><td><span class="rank-pill">5</span></td><td>사이트검색광고</td><td>18</td><td>6.1%</td><td><div class="src-bar-wrap"><div class="src-bar" style="width:13%;background:#9E3A9E"></div></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="sec">
+      <div class="sec-title">주간 플레이스 유입 추이 (1월~6월 1주차)</div>
+      <div class="clegend">
+        <span><span class="cdot" style="background:#3266ad"></span>플레이스 유입</span>
+        <span><span class="cdot" style="background:transparent;border:1px dashed #1D9E75;border-radius:0;width:18px;"></span>스마트콜 (우축)</span>
+      </div>
+      <div class="cwrap" style="height:260px">
+        <canvas id="ci1" role="img" aria-label="시그널스튜디오 일산점 주간 플레이스 유입 추이">6월 1주차 유입 297건으로 하락 지속.</canvas>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-title">이번 주 인사이트</div>
+      <ul class="ins-list">
+        <li class="ins ins-danger">📉 이번 주 플레이스 유입 <strong>297건</strong>으로 전주(-14.9%) 대비 재하락. 4월 급락 이후 300건대 박스권이 지속되며 반등 신호 없음. 1~3월 주평균(1,195건) 대비 약 <strong>75% 감소</strong> 수준.</li>
+        <li class="ins ins-danger">📞 스마트콜 <strong>25건</strong>으로 전주(42건) 대비 -40.5% 급감. 예약/주문도 0건으로 전환 단절. 6월 인바운드 전환율 20%로 연중 최저.</li>
+        <li class="ins ins-warn">🔍 유입 경로에서 <strong>네이버지도 비중이 47.5%</strong>로 1위 — 네이버검색(23.9%)을 크게 앞섬. 3월까지 검색 유입이 지도를 압도했던 것과 반전된 구조. 검색 노출 순위 점검 필요.</li>
+        <li class="ins ins-warn">💬 톡톡 인입 4건으로 전주(9건) 대비 -55.6% 감소. 6월 월간 누적도 4건에 그쳐 채널 활성도 최저 수준.</li>
+        <li class="ins ins-info">📋 홈페이지 문의가 6월 3건으로 전체 10건 중 30% 비중 — 상대적으로 유지되고 있어 홈페이지 유입 경로 강화가 현 시점 가장 안정적인 대안.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       강서점
+  ═══════════════════════════════════════ -->
+  <div id="p-gangseo" class="panel">
+
+    <div class="sec">
+      <div class="sec-title">이번 주 핵심 지표 — 6/1~6/7</div>
+      <div class="hero">
+        <div class="hero-top">
+          <div>
+            <div class="hero-title">플레이스 유입</div>
+            <div class="hero-val">498</div>
+            <div class="hero-cmp"><span class="up arr">↑ +18.9%</span> &nbsp;전주(419) 대비</div>
+          </div>
+          <div class="hero-divider"></div>
+          <div>
+            <div class="hero-title">스마트콜</div>
+            <div class="hero-val">37건</div>
+            <div class="hero-cmp"><span class="up arr">↑ +37.0%</span> &nbsp;전주(27) 대비</div>
+          </div>
+          <div class="hero-divider"></div>
+          <div>
+            <div class="hero-title">예약/주문</div>
+            <div class="hero-val">2건</div>
+            <div class="hero-cmp"><span class="dn arr">↓ -33.3%</span> &nbsp;전주(3) 대비</div>
+          </div>
+        </div>
+        <div class="hero-grid">
+          <div class="hero-cell"><div class="hero-cell-label">리뷰 수</div><div class="hero-cell-val">10건</div><div class="hero-cell-sub"><span class="dn">↓ -9.1%</span> 전주</div></div>
+          <div class="hero-cell"><div class="hero-cell-label">일평균 유입</div><div class="hero-cell-val">71</div><div class="hero-cell-sub">전주 60</div></div>
+          <div class="hero-cell"><div class="hero-cell-label">일평균 콜</div><div class="hero-cell-val">5건</div><div class="hero-cell-sub">전주 4건</div></div>
+          <div class="hero-cell"><div class="hero-cell-label">톡톡 상담</div><div class="hero-cell-val">6건</div><div class="hero-cell-sub"><span class="neu">— 전주 동일</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-title">6월 누적 인바운드 (6/1~ 현재)</div>
+      <div class="mg">
+        <div class="mc"><div class="mc-l">총 문의</div><div class="mc-v">18건</div><div class="mc-s">5월 60건</div></div>
+        <div class="mc"><div class="mc-l">예약 완료</div><div class="mc-v">7건</div><div class="mc-s"><span class="up">전환율 38.9%</span></div></div>
+        <div class="mc"><div class="mc-l">전화 문의</div><div class="mc-v">11건</div><div class="mc-s">주요 채널 유지</div></div>
+        <div class="mc"><div class="mc-l">톡톡 문의</div><div class="mc-v">5건</div><div class="mc-s">안정 유지</div></div>
+        <div class="mc"><div class="mc-l">네이버플레이스</div><div class="mc-v">2건</div><div class="mc-s">5월 14건 → 감소</div></div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-title">유입 경로 분석 — 6/1~6/7</div>
+      <table class="src-table">
+        <thead><tr><th>#</th><th>채널</th><th>유입 수</th><th>비중</th><th></th></tr></thead>
+        <tbody>
+          <tr><td><span class="rank-pill">1</span></td><td>네이버지도</td><td>201</td><td>40.4%</td><td><div class="src-bar-wrap"><div class="src-bar" style="width:100%;background:#533CB7"></div></div></td></tr>
+          <tr><td><span class="rank-pill">2</span></td><td>지역소상공인</td><td>119</td><td>23.9%</td><td><div class="src-bar-wrap"><div class="src-bar" style="width:59%;background:#D85A30"></div></div></td></tr>
+          <tr><td><span class="rank-pill">3</span></td><td>사이트검색광고</td><td>23</td><td>4.6%</td><td><div class="src-bar-wrap"><div class="src-bar" style="width:11%;background:#1D9E75"></div></div></td></tr>
+          <tr><td><span class="rank-pill">4</span></td><td>네이버검색</td><td>88</td><td>17.7%</td><td><div class="src-bar-wrap"><div class="src-bar" style="width:44%;background:#BA7517"></div></div></td></tr>
+          <tr><td><span class="rank-pill">5</span></td><td>플레이스광고</td><td>44</td><td>8.8%</td><td><div class="src-bar-wrap"><div class="src-bar" style="width:22%;background:#9E3A9E"></div></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="sec">
+      <div class="sec-title">주간 플레이스 유입 추이 (1월~6월 1주차)</div>
+      <div class="clegend">
+        <span><span class="cdot" style="background:#533CB7"></span>플레이스 유입</span>
+        <span><span class="cdot" style="background:transparent;border:1px dashed #D85A30;border-radius:0;width:18px;"></span>스마트콜 (우축)</span>
+      </div>
+      <div class="cwrap" style="height:260px">
+        <canvas id="ci2" role="img" aria-label="시그널스튜디오 강서점 주간 플레이스 유입 추이">6월 1주차 유입 498건으로 전주 반등.</canvas>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-title">이번 주 인사이트</div>
+      <ul class="ins-list">
+        <li class="ins ins-ok">📈 이번 주 플레이스 유입 <strong>498건</strong>으로 전주(419) 대비 <strong>+18.9% 반등</strong>. 스마트콜도 27 → 37건으로 동반 상승. 일산점과 달리 강서점은 긍정 신호 확인.</li>
+        <li class="ins ins-info">🗺️ <strong>지역소상공인 채널(119건, 23.9%)</strong>이 이번 주도 안정적으로 2위 유지. 강서점의 지역 밀착 채널이 유입 하락을 방어하는 버퍼 역할 지속.</li>
+        <li class="ins ins-warn">📋 6월 예약/주문 2건으로 전환이 아직 낮음. 유입과 콜은 반등했으나 실예약으로의 연결 강화 필요. 6월 인바운드 전환율 38.9%는 5월(41.7%) 대비 소폭 하락.</li>
+        <li class="ins ins-ok">⭐ 이번 주 리뷰 10건으로 전월 대비 높은 수준 유지. 리뷰 누적이 지역 노출 순위에 긍정 영향 줄 수 있어 리뷰 관리 계속 유효.</li>
+        <li class="ins ins-info">💬 톡톡 6월 누적 6건, 전환율 11.5%로 안정적. 전화 문의(11건)가 여전히 주요 인입 채널로 작동 중.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       파티앳더시그널
+  ═══════════════════════════════════════ -->
+  <div id="p-party" class="panel">
+
+    <div class="sec">
+      <div class="sec-title">이번 주 핵심 지표 — 6/1~6/7</div>
+      <div class="hero">
+        <div class="hero-top">
+          <div>
+            <div class="hero-title">플레이스 유입</div>
+            <div class="hero-val">275</div>
+            <div class="hero-cmp"><span class="up arr">↑ +6.2%</span> &nbsp;전주(259) 대비</div>
+          </div>
+          <div class="hero-divider"></div>
+          <div>
+            <div class="hero-title">스마트콜</div>
+            <div class="hero-val">13건</div>
+            <div class="hero-cmp"><span class="dn arr">↓ -7.1%</span> &nbsp;전주(14) 대비</div>
+          </div>
+          <div class="hero-divider"></div>
+          <div>
+            <div class="hero-title">예약/주문</div>
+            <div class="hero-val">1건</div>
+            <div class="hero-cmp"><span class="dn arr">↓ -75%</span> &nbsp;전주(4) 대비</div>
+          </div>
+        </div>
+        <div class="hero-grid">
+          <div class="hero-cell"><div class="hero-cell-label">리뷰 수</div><div class="hero-cell-val">0건</div><div class="hero-cell-sub"><span class="dn">↓ -100%</span> 전주</div></div>
+          <div class="hero-cell"><div class="hero-cell-label">일평균 유입</div><div class="hero-cell-val">39</div><div class="hero-cell-sub">전주 37</div></div>
+          <div class="hero-cell"><div class="hero-cell-label">일평균 콜</div><div class="hero-cell-val">2건</div><div class="hero-cell-sub">전주 2건</div></div>
+          <div class="hero-cell"><div class="hero-cell-label">톡톡 상담</div><div class="hero-cell-val">12건</div><div class="hero-cell-sub"><span class="up">↑ 급증</span> 전주 7건</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-title">6월 누적 인바운드 (6/1~ 현재)</div>
+      <div class="mg">
+        <div class="mc"><div class="mc-l">총 문의</div><div class="mc-v">14건</div><div class="mc-s">5월 16건 유사</div></div>
+        <div class="mc"><div class="mc-l">예약 완료</div><div class="mc-v">0건</div><div class="mc-s"><span class="dn">전환율 0%</span></div></div>
+        <div class="mc"><div class="mc-l">전화 문의</div><div class="mc-v">4건</div><div class="mc-s">5월 3건</div></div>
+        <div class="mc"><div class="mc-l">톡톡 문의</div><div class="mc-v">8건</div><div class="mc-s"><span class="up">↑ 비중 57%</span></div></div>
+        <div class="mc"><div class="mc-l">네이버플레이스</div><div class="mc-v">1건</div><div class="mc-s">5월 4건 → 감소</div></div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-title">유입 경로 분석 — 6/1~6/7</div>
+      <table class="src-table">
+        <thead><tr><th>#</th><th>채널</th><th>유입 수</th><th>비중</th><th></th></tr></thead>
+        <tbody>
+          <tr><td><span class="rank-pill">1</span></td><td>네이버지도</td><td>103</td><td>37.5%</td><td><div class="src-bar-wrap"><div class="src-bar" style="width:100%;background:#BA7517"></div></div></td></tr>
+          <tr><td><span class="rank-pill">2</span></td><td>네이버검색</td><td>90</td><td>32.7%</td><td><div class="src-bar-wrap"><div class="src-bar" style="width:87%;background:#185FA5"></div></div></td></tr>
+          <tr><td><span class="rank-pill">3</span></td><td>플레이스광고</td><td>54</td><td>19.6%</td><td><div class="src-bar-wrap"><div class="src-bar" style="width:52%;background:#1D9E75"></div></div></td></tr>
+          <tr><td><span class="rank-pill">4</span></td><td>네이버 블로그</td><td>11</td><td>4.0%</td><td><div class="src-bar-wrap"><div class="src-bar" style="width:11%;background:#D85A30"></div></div></td></tr>
+          <tr><td><span class="rank-pill">5</span></td><td>네이버 톡톡</td><td>5</td><td>1.8%</td><td><div class="src-bar-wrap"><div class="src-bar" style="width:5%;background:#9E3A9E"></div></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="sec">
+      <div class="sec-title">주간 플레이스 유입 추이 (1월~6월 1주차)</div>
+      <div class="clegend">
+        <span><span class="cdot" style="background:#BA7517"></span>플레이스 유입</span>
+        <span><span class="cdot" style="background:transparent;border:1px dashed #185FA5;border-radius:0;width:18px;"></span>스마트콜 (우축)</span>
+      </div>
+      <div class="cwrap" style="height:260px">
+        <canvas id="ci3" role="img" aria-label="파티앳더시그널 일산점 주간 플레이스 유입 추이">6월 1주차 유입 275건으로 전주 대비 소폭 상승.</canvas>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-title">이번 주 인사이트</div>
+      <ul class="ins-list">
+        <li class="ins ins-danger">🚨 6월 누적 예약 완료 <strong>0건</strong> — 문의(14건)와 톡톡 상담(8건)이 있음에도 전환이 전혀 이루어지지 않은 상태. 상담 응답 속도 및 예약 프로세스 점검 긴급 필요.</li>
+        <li class="ins ins-warn">💬 톡톡 상담이 이번 주 <strong>12건</strong>으로 6월 최고치 급증 — 월간 누계도 이미 12건(전월 17건). 유입 의향은 있으나 예약으로 전환되지 않는 구조가 반복됨.</li>
+        <li class="ins ins-ok">📈 플레이스 유입 275건으로 전주(259) 대비 +6.2% 소폭 상승. 시그널스튜디오 대비 유입 낙폭이 적어 플레이스광고 의존 구조의 안정성 확인.</li>
+        <li class="ins ins-info">📰 네이버 블로그 유입 11건(4.0%)으로 꾸준히 경로 내 존재. 파티 서비스 특성상 블로그·SNS 콘텐츠 강화 시 유입 다각화 가능.</li>
+        <li class="ins ins-warn">⭐ 이번 주 리뷰 0건. 5월 평균 주당 1.4건 대비 하락. 리뷰 유도 활동(카카오 문자/톡톡 후속 메시지) 재가동 권장.</li>
+      </ul>
+    </div>
+
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+const gc = dark ? 'rgba(255,255,255,.07)' : 'rgba(0,0,0,.06)';
+const tc = dark ? 'rgba(255,255,255,.48)' : 'rgba(0,0,0,.4)';
+
+const wk = ['1/1주','1/2주','1/3주','1/4주','2/1주','2/2주','2/3주','2/4주',
+            '3/1주','3/2주','3/3주','3/4주','3/5주',
+            '4/1주','4/2주','4/3주','4/4주',
+            '5/1주','5/2주','5/3주','5/4주','6/1주'];
+
+const ds = {
+  ilsan:   { inf:[917,1040,1065,1084,1314,1259,1321,1189,1205,1552,1169,1143,1234,392,392,432,413,511,380,345,349,297], cal:[39,33,35,39,26,43,41,55,42,33,27,37,39,32,43,46,29,36,28,48,42,25] },
+  gangseo: { inf:[793,678,597,604,993,1281,1496,1385,1407,1721,1543,1395,1415,559,543,670,604,732,500,505,419,498], cal:[42,43,42,27,40,29,46,71,55,50,49,51,32,46,53,64,44,42,41,34,27,37] },
+  party:   { inf:[225,294,187,218,274,170,309,317,242,285,247,265,243,263,211,247,288,229,145,196,259,275], cal:[14,14,15,8,16,11,17,17,12,11,16,11,15,12,12,11,13,11,9,17,14,13] }
+};
+const clr = { ilsan:['#3266ad','#1D9E75'], gangseo:['#533CB7','#D85A30'], party:['#BA7517','#185FA5'] };
+
+function mkLine(id, key) {
+  const [lc,cc] = clr[key];
+  const n = ds[key].inf.length;
+  const ptR = wk.slice(0,n).map((_,i) => i === n-1 ? 5 : 2);
+  const ptBg = wk.slice(0,n).map((_,i) => i === n-1 ? lc : lc+'88');
+  new Chart(document.getElementById(id), {
+    type:'line',
+    data:{
+      labels: wk.slice(0,n),
+      datasets:[
+        { label:'유입', data:ds[key].inf, borderColor:lc, backgroundColor:lc+'15',
+          borderWidth:2, pointRadius:ptR, pointBackgroundColor:ptBg,
+          fill:true, tension:.3, yAxisID:'y' },
+        { label:'스마트콜', data:ds[key].cal, borderColor:cc, backgroundColor:'transparent',
+          borderWidth:1.5, pointRadius:ptR, borderDash:[5,3], tension:.3, yAxisID:'y1' }
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{title:t=>t[0].label+'차'}}
+      },
+      scales:{
+        x:{ticks:{font:{size:10},color:tc,maxRotation:45,autoSkip:false},grid:{color:gc}},
+        y:{ticks:{font:{size:10},color:tc},grid:{color:gc},title:{display:true,text:'유입수',font:{size:10},color:tc}},
+        y1:{position:'right',ticks:{font:{size:10},color:tc},grid:{drawOnChartArea:false},title:{display:true,text:'스마트콜',font:{size:10},color:tc}}
+      }
+    }
+  });
+}
+
+mkLine('ci1','ilsan');
+mkLine('ci2','gangseo');
+mkLine('ci3','party');
+
+function sw(id) {
+  const ids=['ilsan','gangseo','party'];
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',ids[i]===id));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('p-'+id).classList.add('active');
+}
+</script>
+</body>
+</html>

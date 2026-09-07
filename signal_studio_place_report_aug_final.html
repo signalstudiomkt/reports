@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>네이버 플레이스 월간 리포트 - 2026년 7~8월</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 32px 16px; background: #F5F4F0; font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif; color: #2B2A28; }
+  .wrap { max-width: 800px; margin: 0 auto; }
+  .header { text-align: center; margin-bottom: 28px; }
+  .header .eyebrow { font-size: 13px; letter-spacing: 0.08em; color: #8A8578; text-transform: uppercase; margin-bottom: 6px; }
+  .header h1 { font-size: 24px; margin: 0 0 6px; color: #1F1E1C; }
+  .header .period { font-size: 14px; color: #6B6659; }
+
+  .card { background: #FFFFFF; border-radius: 16px; padding: 22px 22px 20px; margin-bottom: 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); border: 1px solid #EAE8E1; }
+  .card-title { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+  .card-title h2 { font-size: 18px; margin: 0; color: #1F1E1C; }
+  .card-sub { font-size: 12px; color: #8A8578; margin-bottom: 16px; }
+
+  .month-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .month-box { background: #FAF9F6; border-radius: 12px; padding: 14px; }
+  .month-box .month-title { font-size: 12px; font-weight: 700; color: #8A8578; margin-bottom: 10px; }
+  .month-box .mstat { display: flex; justify-content: space-between; font-size: 13px; padding: 3px 0; }
+  .month-box .mstat .l { color: #6B6659; }
+  .month-box .mstat .v { font-weight: 700; color: #1F1E1C; }
+  .mom-badge { font-size: 11px; padding: 2px 7px; border-radius: 999px; margin-left: 6px; }
+  .mom-badge.up { background: #E7F3E8; color: #2E7D32; }
+  .mom-badge.down { background: #FCEAE9; color: #C62828; }
+
+  .section-label { font-size: 12px; font-weight: 700; color: #6B6659; margin: 14px 0 8px; text-transform: uppercase; letter-spacing: 0.04em; }
+
+  table.weekly-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 4px; }
+  table.weekly-table th, table.weekly-table td { padding: 6px 5px; text-align: center; border-bottom: 1px solid #F1EFE9; }
+  table.weekly-table th { color: #8A8578; font-weight: 600; font-size: 10.5px; }
+  table.weekly-table td.week-label { text-align: left; color: #6B6659; }
+  table.weekly-table tr.month-sep td { border-top: 2px solid #E0DDD3; }
+
+  .bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 12.5px; }
+  .bar-row .bar-label { width: 100px; color: #6B6659; flex-shrink: 0; }
+  .bar-track { flex: 1; background: #F1EFE9; border-radius: 6px; height: 16px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 6px; }
+  .bar-row .bar-value { width: 48px; text-align: right; color: #1F1E1C; font-weight: 600; flex-shrink: 0; }
+
+  .talk-row { display: flex; gap: 10px; margin-top: 4px; }
+  .talk-box { flex: 1; background: #FAF9F6; border-radius: 10px; padding: 10px 12px; }
+  .talk-box .label { font-size: 11px; color: #8A8578; }
+  .talk-box .value { font-size: 16px; font-weight: 700; color: #1F1E1C; margin-top: 2px; }
+  .talk-note { font-size: 11px; color: #B0937A; margin-top: 6px; }
+
+  .chart-wrap { background: #FFFFFF; border-radius: 16px; padding: 20px 20px 8px; border: 1px solid #EAE8E1; margin-top: 6px; }
+  .chart-wrap h2 { font-size: 16px; margin: 0 0 12px; color: #1F1E1C; }
+  canvas { max-height: 260px; }
+
+  .summary-card { background: linear-gradient(135deg, #FBF9F5, #F3F1EA); border: 1px solid #EAE8E1; border-radius: 16px; padding: 20px 22px; margin-bottom: 18px; }
+  .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 14px; }
+  .summary-box { text-align: center; }
+  .summary-box .loc { font-size: 12px; color: #8A8578; margin-bottom: 4px; }
+  .summary-box .val { font-size: 20px; font-weight: 700; }
+  .summary-box .mom { font-size: 11.5px; margin-top: 2px; }
+  .summary-box.ilsan .val { color: #B9915C; }
+  .summary-box.gangseo .val { color: #7C93B3; }
+  .summary-box.party .val { color: #8FA98A; }
+
+  .footer { text-align: center; font-size: 11.5px; color: #9C9689; margin-top: 22px; line-height: 1.6; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <div class="eyebrow">Signal Studio · Naver Place Monthly</div>
+    <h1>📍 네이버 플레이스 월간 리포트</h1>
+    <div class="period">2026년 7~8월 전체 (7/6 ~ 8/30, 8주)</div>
+  </div>
+
+  <div class="summary-card">
+    <div class="section-label" style="margin-top:0;">📊 지점별 8월 플레이스유입 (전월대비)</div>
+    <div class="summary-grid">
+      <div class="summary-box ilsan"><div class="loc">일산점</div><div class="val">1,333</div><div class="mom" style="color:#C62828;">▼0.3%</div></div>
+      <div class="summary-box gangseo"><div class="loc">강서점</div><div class="val">2,104</div><div class="mom" style="color:#2E7D32;">▲18.9%</div></div>
+      <div class="summary-box party"><div class="loc">파티앳더시그널</div><div class="val">1,201</div><div class="mom" style="color:#2E7D32;">▲2.1%</div></div>
+    </div>
+  </div>
+
+  <!-- 일산점 -->
+  <div class="card">
+    <div class="card-title"><h2>🏢 시그널스튜디오 일산점</h2></div>
+    <div class="card-sub">7월 vs 8월 비교</div>
+
+    <div class="month-compare">
+      <div class="month-box">
+        <div class="month-title">7월 합계</div>
+        <div class="mstat"><span class="l">플레이스유입</span><span class="v">1,337</span></div>
+        <div class="mstat"><span class="l">예약/주문</span><span class="v">7</span></div>
+        <div class="mstat"><span class="l">스마트콜</span><span class="v">119</span></div>
+        <div class="mstat"><span class="l">리뷰수</span><span class="v">26</span></div>
+      </div>
+      <div class="month-box">
+        <div class="month-title">8월 합계</div>
+        <div class="mstat"><span class="l">플레이스유입</span><span class="v">1,333 <span class="mom-badge down">▼0.3%</span></span></div>
+        <div class="mstat"><span class="l">예약/주문</span><span class="v">5 <span class="mom-badge down">▼28.6%</span></span></div>
+        <div class="mstat"><span class="l">스마트콜</span><span class="v">85 <span class="mom-badge down">▼28.6%</span></span></div>
+        <div class="mstat"><span class="l">리뷰수</span><span class="v">17 <span class="mom-badge down">▼34.6%</span></span></div>
+      </div>
+    </div>
+
+    <div class="section-label">주차별 추이 (8주)</div>
+    <table class="weekly-table">
+      <tr><th style="text-align:left;">주차</th><th>유입</th><th>예약</th><th>콜</th><th>리뷰</th></tr>
+      <tr><td class="week-label">7월 1주 (7/6~7/12)</td><td>373</td><td>2</td><td>21</td><td>3</td></tr>
+      <tr><td class="week-label">7월 2주 (7/13~7/19)</td><td>307</td><td>1</td><td>35</td><td>8</td></tr>
+      <tr><td class="week-label">7월 3주 (7/20~7/26)</td><td>326</td><td>3</td><td>24</td><td>6</td></tr>
+      <tr><td class="week-label">7월 4주 (7/27~8/2)</td><td>331</td><td>1</td><td>39</td><td>9</td></tr>
+      <tr class="month-sep"><td class="week-label">8월 1주 (8/3~8/9)</td><td>367</td><td>2</td><td>27</td><td>7</td></tr>
+      <tr><td class="week-label">8월 2주 (8/10~8/16)</td><td>353</td><td>0</td><td>15</td><td>4</td></tr>
+      <tr><td class="week-label">8월 3주 (8/17~8/23)</td><td>328</td><td>3</td><td>24</td><td>3</td></tr>
+      <tr><td class="week-label">8월 4주 (8/24~8/30)</td><td>285</td><td>0</td><td>19</td><td>3</td></tr>
+    </table>
+
+    <div class="section-label">유입경로 Top5 (8월 합계)</div>
+    <div class="bar-row"><div class="bar-label">네이버지도</div><div class="bar-track"><div class="bar-fill" style="width:100%;background:#B9915C"></div></div><div class="bar-value">537</div></div>
+    <div class="bar-row"><div class="bar-label">네이버검색</div><div class="bar-track"><div class="bar-fill" style="width:61.6%;background:#B9915C"></div></div><div class="bar-value">331</div></div>
+    <div class="bar-row"><div class="bar-label">플레이스광고</div><div class="bar-track"><div class="bar-fill" style="width:31.1%;background:#B9915C"></div></div><div class="bar-value">167</div></div>
+    <div class="bar-row"><div class="bar-label">사이트검색광고</div><div class="bar-track"><div class="bar-fill" style="width:23.8%;background:#B9915C"></div></div><div class="bar-value">128</div></div>
+    <div class="bar-row"><div class="bar-label">지역소상공인</div><div class="bar-track"><div class="bar-fill" style="width:19.7%;background:#B9915C"></div></div><div class="bar-value">106</div></div>
+
+    <div class="section-label">네이버 톡톡 (8월 월간)</div>
+    <div class="talk-row">
+      <div class="talk-box"><div class="label">인입상담수</div><div class="value">26건</div></div>
+      <div class="talk-box"><div class="label">조회수</div><div class="value">203</div></div>
+      <div class="talk-box"><div class="label">상담전환율</div><div class="value">12.8%</div></div>
+    </div>
+  </div>
+
+  <!-- 강서점 -->
+  <div class="card">
+    <div class="card-title"><h2>🏢 시그널스튜디오 강서점</h2></div>
+    <div class="card-sub">7월 vs 8월 비교 — 8월 전 지점 중 최다 유입 · 최대 상승폭</div>
+
+    <div class="month-compare">
+      <div class="month-box">
+        <div class="month-title">7월 합계</div>
+        <div class="mstat"><span class="l">플레이스유입</span><span class="v">1,770</span></div>
+        <div class="mstat"><span class="l">예약/주문</span><span class="v">18</span></div>
+        <div class="mstat"><span class="l">스마트콜</span><span class="v">90</span></div>
+        <div class="mstat"><span class="l">리뷰수</span><span class="v">19</span></div>
+      </div>
+      <div class="month-box">
+        <div class="month-title">8월 합계</div>
+        <div class="mstat"><span class="l">플레이스유입</span><span class="v">2,104 <span class="mom-badge up">▲18.9%</span></span></div>
+        <div class="mstat"><span class="l">예약/주문</span><span class="v">22 <span class="mom-badge up">▲22.2%</span></span></div>
+        <div class="mstat"><span class="l">스마트콜</span><span class="v">147 <span class="mom-badge up">▲63.3%</span></span></div>
+        <div class="mstat"><span class="l">리뷰수</span><span class="v">25 <span class="mom-badge up">▲31.6%</span></span></div>
+      </div>
+    </div>
+
+    <div class="section-label">주차별 추이 (8주)</div>
+    <table class="weekly-table">
+      <tr><th style="text-align:left;">주차</th><th>유입</th><th>예약</th><th>콜</th><th>리뷰</th></tr>
+      <tr><td class="week-label">7월 1주 (7/6~7/12)</td><td>354</td><td>8</td><td>26</td><td>2</td></tr>
+      <tr><td class="week-label">7월 2주 (7/13~7/19)</td><td>490</td><td>5</td><td>24</td><td>5</td></tr>
+      <tr><td class="week-label">7월 3주 (7/20~7/26)</td><td>485</td><td>2</td><td>14</td><td>7</td></tr>
+      <tr><td class="week-label">7월 4주 (7/27~8/2)</td><td>441</td><td>3</td><td>26</td><td>5</td></tr>
+      <tr class="month-sep"><td class="week-label">8월 1주 (8/3~8/9)</td><td>472</td><td>10</td><td>33</td><td>7</td></tr>
+      <tr><td class="week-label">8월 2주 (8/10~8/16)</td><td>511</td><td>4</td><td>44</td><td>6</td></tr>
+      <tr><td class="week-label">8월 3주 (8/17~8/23)</td><td>616</td><td>3</td><td>48</td><td>6</td></tr>
+      <tr><td class="week-label">8월 4주 (8/24~8/30)</td><td>505</td><td>5</td><td>22</td><td>6</td></tr>
+    </table>
+
+    <div class="section-label">유입경로 Top5 (8월 합계)</div>
+    <div class="bar-row"><div class="bar-label">네이버지도</div><div class="bar-track"><div class="bar-fill" style="width:100%;background:#7C93B3"></div></div><div class="bar-value">869</div></div>
+    <div class="bar-row"><div class="bar-label">지역소상공인</div><div class="bar-track"><div class="bar-fill" style="width:44.9%;background:#7C93B3"></div></div><div class="bar-value">390</div></div>
+    <div class="bar-row"><div class="bar-label">플레이스광고</div><div class="bar-track"><div class="bar-fill" style="width:43.5%;background:#7C93B3"></div></div><div class="bar-value">378</div></div>
+    <div class="bar-row"><div class="bar-label">네이버검색</div><div class="bar-track"><div class="bar-fill" style="width:31.2%;background:#7C93B3"></div></div><div class="bar-value">271</div></div>
+    <div class="bar-row"><div class="bar-label">사이트검색광고</div><div class="bar-track"><div class="bar-fill" style="width:9.6%;background:#7C93B3"></div></div><div class="bar-value">83</div></div>
+
+    <div class="section-label">네이버 톡톡 (8월 월간)</div>
+    <div class="talk-row">
+      <div class="talk-box"><div class="label">인입상담수</div><div class="value">38건</div></div>
+      <div class="talk-box"><div class="label">조회수</div><div class="value">325</div></div>
+      <div class="talk-box"><div class="label">상담전환율</div><div class="value">11.7%</div></div>
+    </div>
+    <div class="talk-note">※ 플레이스광고 유입비중이 7월 대비 크게 늘어 유입 급증에 영향을 준 것으로 보임 — 광고비 집행 확인 권장</div>
+  </div>
+
+  <!-- 파티앳더시그널 -->
+  <div class="card">
+    <div class="card-title"><h2>🎉 파티앳더시그널 일산점</h2></div>
+    <div class="card-sub">7월 vs 8월 비교</div>
+
+    <div class="month-compare">
+      <div class="month-box">
+        <div class="month-title">7월 합계</div>
+        <div class="mstat"><span class="l">플레이스유입</span><span class="v">1,176</span></div>
+        <div class="mstat"><span class="l">예약/주문</span><span class="v">14</span></div>
+        <div class="mstat"><span class="l">스마트콜</span><span class="v">68</span></div>
+        <div class="mstat"><span class="l">리뷰수</span><span class="v">1</span></div>
+      </div>
+      <div class="month-box">
+        <div class="month-title">8월 합계</div>
+        <div class="mstat"><span class="l">플레이스유입</span><span class="v">1,201 <span class="mom-badge up">▲2.1%</span></span></div>
+        <div class="mstat"><span class="l">예약/주문</span><span class="v">10 <span class="mom-badge down">▼28.6%</span></span></div>
+        <div class="mstat"><span class="l">스마트콜</span><span class="v">57 <span class="mom-badge down">▼16.2%</span></span></div>
+        <div class="mstat"><span class="l">리뷰수</span><span class="v">9 <span class="mom-badge up">▲800.0%</span></span></div>
+      </div>
+    </div>
+
+    <div class="section-label">주차별 추이 (8주)</div>
+    <table class="weekly-table">
+      <tr><th style="text-align:left;">주차</th><th>유입</th><th>예약</th><th>콜</th><th>리뷰</th></tr>
+      <tr><td class="week-label">7월 1주 (7/6~7/12)</td><td>316</td><td>4</td><td>16</td><td>0</td></tr>
+      <tr><td class="week-label">7월 2주 (7/13~7/19)</td><td>344</td><td>1</td><td>27</td><td>0</td></tr>
+      <tr><td class="week-label">7월 3주 (7/20~7/26)</td><td>256</td><td>5</td><td>10</td><td>1</td></tr>
+      <tr><td class="week-label">7월 4주 (7/27~8/2)</td><td>260</td><td>4</td><td>15</td><td>0</td></tr>
+      <tr class="month-sep"><td class="week-label">8월 1주 (8/3~8/9)</td><td>293</td><td>2</td><td>16</td><td>0</td></tr>
+      <tr><td class="week-label">8월 2주 (8/10~8/16)</td><td>317</td><td>5</td><td>13</td><td>5</td></tr>
+      <tr><td class="week-label">8월 3주 (8/17~8/23)</td><td>269</td><td>2</td><td>17</td><td>3</td></tr>
+      <tr><td class="week-label">8월 4주 (8/24~8/30)</td><td>322</td><td>1</td><td>11</td><td>1</td></tr>
+    </table>
+
+    <div class="section-label">유입경로 Top5 (8월 합계)</div>
+    <div class="bar-row"><div class="bar-label">네이버지도</div><div class="bar-track"><div class="bar-fill" style="width:100%;background:#8FA98A"></div></div><div class="bar-value">583</div></div>
+    <div class="bar-row"><div class="bar-label">네이버검색</div><div class="bar-track"><div class="bar-fill" style="width:56.3%;background:#8FA98A"></div></div><div class="bar-value">328</div></div>
+    <div class="bar-row"><div class="bar-label">플레이스광고</div><div class="bar-track"><div class="bar-fill" style="width:30.0%;background:#8FA98A"></div></div><div class="bar-value">175</div></div>
+    <div class="bar-row"><div class="bar-label">네이버 블로그</div><div class="bar-track"><div class="bar-fill" style="width:11.5%;background:#8FA98A"></div></div><div class="bar-value">67</div></div>
+    <div class="bar-row"><div class="bar-label">네이버 톡톡</div><div class="bar-track"><div class="bar-fill" style="width:1.9%;background:#8FA98A"></div></div><div class="bar-value">11</div></div>
+
+    <div class="section-label">네이버 톡톡 (8월 월간)</div>
+    <div class="talk-row">
+      <div class="talk-box"><div class="label">인입상담수</div><div class="value">24건</div></div>
+      <div class="talk-box"><div class="label">조회수</div><div class="value">219</div></div>
+      <div class="talk-box"><div class="label">상담전환율</div><div class="value">11.0%</div></div>
+    </div>
+    <div class="talk-note">✓ 리뷰수가 7월 1건 → 8월 9건으로 크게 개선됨 (2주차에 5건 집중)</div>
+  </div>
+
+  <div class="chart-wrap">
+    <h2>📈 7~8월 주차별 플레이스유입 추이 (전 지점, 8주)</h2>
+    <canvas id="trendChart"></canvas>
+  </div>
+
+  <div class="chart-wrap" style="margin-top:18px;">
+    <h2>📞 7~8월 주차별 스마트콜 추이 (전 지점)</h2>
+    <canvas id="callChart"></canvas>
+  </div>
+
+  <div class="footer">
+    데이터 출처: 네이버 플레이스 통계, 네이버 톡톡 (Google Sheets 대시보드)<br>
+    ※ 톡톡 조회수·전환율은 시트의 월간 집계 셀 값을 우선 반영함<br>
+    생성일 2026-09-07 · 2026년 7~8월 전체(1~4주차 × 2개월) 확정 데이터 기준
+  </div>
+
+</div>
+
+<script>
+const weekLabels = ['7-1주','7-2주','7-3주','7-4주','8-1주','8-2주','8-3주','8-4주'];
+
+const ctx1 = document.getElementById('trendChart').getContext('2d');
+new Chart(ctx1, {
+  type: 'line',
+  data: {
+    labels: weekLabels,
+    datasets: [
+      { label: '일산점', data: [373, 307, 326, 331, 367, 353, 328, 285], borderColor: '#B9915C', backgroundColor: '#B9915C', tension: 0.3 },
+      { label: '강서점', data: [354, 490, 485, 441, 472, 511, 616, 505], borderColor: '#7C93B3', backgroundColor: '#7C93B3', tension: 0.3 },
+      { label: '파티앳더시그널', data: [316, 344, 256, 260, 293, 317, 269, 322], borderColor: '#8FA98A', backgroundColor: '#8FA98A', tension: 0.3 }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } },
+    scales: { y: { beginAtZero: true, grid: { color: '#EFEDE8' } }, x: { grid: { display: false } } }
+  }
+});
+
+const ctx2 = document.getElementById('callChart').getContext('2d');
+new Chart(ctx2, {
+  type: 'bar',
+  data: {
+    labels: weekLabels,
+    datasets: [
+      { label: '일산점', data: [21, 35, 24, 39, 27, 15, 24, 19], backgroundColor: '#B9915C', borderRadius: 6 },
+      { label: '강서점', data: [26, 24, 14, 26, 33, 44, 48, 22], backgroundColor: '#7C93B3', borderRadius: 6 },
+      { label: '파티앳더시그널', data: [16, 27, 10, 15, 16, 13, 17, 11], backgroundColor: '#8FA98A', borderRadius: 6 }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } },
+    scales: { y: { beginAtZero: true, grid: { color: '#EFEDE8' } }, x: { grid: { display: false } } }
+  }
+});
+</script>
+
+</body>
+</html>
